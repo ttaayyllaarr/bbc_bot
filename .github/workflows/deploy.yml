@@ -9,22 +9,25 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Enable Debugging
-        run: set -x  # Enables detailed output
-
-      - name: Checkout code
+      - name: Checkout Repo
         uses: actions/checkout@v3
+
+      - name: Decode SSH Key
+        run: |
+          echo "${{ secrets.AWS_SSH_KEY_BASE64 }}" | base64 -d > key.pem
+          chmod 600 key.pem
 
       - name: SSH into AWS and deploy
         uses: appleboy/ssh-action@v0.1.3
         with:
           host: ${{ secrets.AWS_HOST }}
           username: ec2-user
-          key: ${{ secrets.AWS_SSH_KEY }}
+          key: key.pem
           script: |
             cd /home/ec2-user/bbc_bot
             git pull origin main
             pm2 restart all
+
 
 
 env:
