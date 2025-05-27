@@ -11,7 +11,8 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 
-GUILD_ID = discord.Object(id=1143725025350930432)
+# Load token from environment variable
+TOKEN = os.getenv("DISCORD_BOT_TOKEN")
 SETTINGS_FILE = "settings.json"
 HELP_FILE = "help.json"
 BONES_FILE = "bones.json"
@@ -99,6 +100,12 @@ def save_json(data):
     except IOError as e:
         print(f"⚠️ ERROR: Failed to write to bones.json! {e}")
 
+client = discord.Client
+@client.event
+async def on_ready():
+    print(f'Logged in as {client.user}')
+
+client.run(TOKEN)
 
 @bot.event
 async def on_ready():
@@ -826,7 +833,3 @@ async def help(interaction: discord.Interaction):
 
     view = HelpView(page)  # Start at page 1
     await interaction.response.send_message(embed=embed, view=view)
-
-
-bot.run('MTM3NjI5OTY5MjY1NjE2ODk3MA.G03myl.YJKXS29GNRU0g_3b4zpgmxO7XQpN-m48AXllpE')
-
