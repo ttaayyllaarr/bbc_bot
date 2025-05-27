@@ -1,0 +1,42 @@
+{
+    "help": {
+        "description": "Displays available commands and usage.",
+        "usage": "/help"
+    },
+    "addname": {
+        "description": "Add a new name to the list.",
+        "usage": "/addname <name>"
+    },
+    "removename": {
+        "description": "Remove a name from the list.",
+        "usage": "/removename"
+    },
+    "adjustcount": {
+        "description": "Manually adjust the count for a name in the database.",
+        "usage": "/adjustcount"
+    },
+    "bone": {
+        "description": "Add +1 bone to a selected name's count using a dropdown.",
+        "usage": "/bone"
+    },
+    "showbones": {
+        "description": "Displays information about bones collected.",
+        "usage": "/showbones"
+    },
+    "move": {
+        "description": "Move a specific item to a new location.",
+        "usage": "/move <destination channel>"
+    },
+    "moveall": {
+        "description": "Moves all items in a category to a new location.",
+        "usage": "/moveall <source_channel> <destination_channel>"
+    },
+    "timestamp_conversion": {
+        "description": "Automatically detects timestamps in messages and converts them to Discord's timestamp format.",
+        "usage": "Send a message containing a timestamp, such as 'tomorrow at 5pm' or 'next Friday at noon'. The bot will reply with a converted timestamp."
+    },
+    "create_temp_vc": {
+        "description": "Creates a temporary voice channel that auto-deletes when empty.",
+        "usage": "Join lobby channel to create a temporary voice channel"
+    }
+}
