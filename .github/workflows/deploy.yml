@@ -22,7 +22,7 @@ jobs:
           username: ec2-user
           key: ${{ secrets.AWS_SSH_KEY }}
           script: |
-            cd /home/ec2-user/YOUR-REPO
+            cd /home/ec2-user/bbc_bot
             git pull origin main
             pm2 restart all
 
