@@ -16,6 +16,11 @@ jobs:
         run: |
           echo "${{ secrets.AWS_SSH_KEY_BASE64 }}" | base64 -d > key.pem
           chmod 600 key.pem
+          
+      - name: Debug decoded key
+        run: |
+          echo "First 5 lines of key.pem:"
+          head -n 5 key.pem
 
       - name: SSH into AWS and deploy
         uses: appleboy/ssh-action@v0.1.3
