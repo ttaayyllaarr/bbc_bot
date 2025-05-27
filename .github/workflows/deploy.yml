@@ -26,5 +26,6 @@ jobs:
             git pull origin main
             pm2 restart all
 
+
 env:
   DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
