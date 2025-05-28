@@ -5,6 +5,7 @@ import os
 import pytz
 from datetime import datetime
 from dateutil import parser
+from dotenv import load_dotenv
 import dateparser
 import parsedatetime
 import discord
@@ -12,7 +13,18 @@ from discord.ext import commands
 from discord import app_commands
 
 # Load token from environment variable
+load_dotenv()
 TOKEN = os.getenv("DISCORD_BOT_TOKEN")
+if TOKEN:
+    print("✅ Token loaded successfully!")
+else:
+    print("DISCORD_BOT_TOKEN not found!")
+
+intents = discord.Intents.default()
+intents.message_content = True  # Enable message content intent
+intents.voice_states = True  # Ensure you have voice intents enabled
+bot = commands.Bot(command_prefix="!", intents=intents)
+
 SETTINGS_FILE = "settings.json"
 HELP_FILE = "help.json"
 BONES_FILE = "bones.json"
@@ -21,11 +33,6 @@ script_dir = os.path.dirname(os.path.abspath(__file__))  # Gets correct Linux pa
 bot_file = os.path.join(script_dir, "main.py")  # Builds a platform-independent path
 
 print(f"Loading bot from {bot_file}")  # ✅ Debugging
-
-intents = discord.Intents.default()
-intents.message_content = True  # Enable message content intent
-intents.voice_states = True  # Ensure you have voice intents enabled
-bot = commands.Bot(command_prefix="!", intents=intents)
 
 cal = parsedatetime.Calendar()
 
@@ -100,23 +107,49 @@ def save_json(data):
     except IOError as e:
         print(f"⚠️ ERROR: Failed to write to bones.json! {e}")
 
-client = discord.Client
-@client.event
-async def on_ready():
-    print(f'Logged in as {client.user}')
+async def force_reset_commands():
+    await bot.wait_until_ready()
 
-client.run(TOKEN)
+    try:
+        print("🛠 Manually removing all commands from bot tree...")
+        for command in bot.tree.get_commands():
+            bot.tree.remove_command(command.name)
+        print("✅ Successfully removed all commands!")
+
+        # Debug: Print commands BEFORE syncing to see if any exist
+        print("📜 Commands before syncing:", bot.tree.get_commands())
+
+        print("🔄 Syncing all slash commands globally...")
+        # synced = await bot.tree.sync()
+        # print(f"✅ Synced {len(synced)} commands globally!")
+
+    except Exception as e:
+        print(f"⚠️ Error resetting commands: {e}")
+
+async def register_commands():
+    await bot.wait_until_ready()
+    
+    print("🛠 Registering commands before syncing...")
+    
+    bot.tree.add_command(help)  # Manually add the command
+    print(f"✅ Registered {len(bot.tree.get_commands())} commands!")
+
+    synced = await bot.tree.sync()
+    print(f"✅ Synced {len(synced)} commands globally!")
 
 @bot.event
 async def on_ready():
-    print(f'Logged in as {bot.user}')
-    try:
-        # await bot.tree.sync(guild=GUILD_ID)  # Corrected guild sync
-        await bot.tree.sync()  # Sync slash commands globally
-                        
-    except Exception as e:
-        print(f"⚠️ Slash command sync failed: {e}")
-    
+    print(f'✅ Logged in as {bot.user}')
+    bot.loop.create_task(force_reset_commands())  # Reset and resync commands
+    bot.loop.create_task(register_commands())  # Register and sync commands
+
+@bot.event
+async def on_guild_join(guild):
+    print(f"Joined new server: {guild.name} (ID: {guild.id})")
+
+    # Send a welcome message to the system channel (if set)
+    if guild.system_channel:
+        await guild.system_channel.send("Hello! Thanks for adding me to your server!")
 
 @bot.event
 async def on_message(message):
@@ -822,14 +855,34 @@ class NextPageButton(discord.ui.Button):
 
 @bot.tree.command(name="help", description="Shows available commands")
 async def help(interaction: discord.Interaction):
-    # Displays paginated help embed.
+    await interaction.response.defer(ephemeral=True)  # Properly acknowledge the interaction
+
+    # Load paginated help data
     help_data = load_help_data()
     page = 1
     commands, max_pages = paginate_help(help_data, page)
 
-    embed = discord.Embed(title="📖 Bot Commands", description=f"Page {page}/{max_pages}", color=discord.Color(0x7eff00))
+    embed = discord.Embed(
+        title="📖 Bot Commands",
+        description=f"Page {page}/{max_pages}",
+        color=discord.Color(0x7eff00)
+    )
+    
     for command, details in commands:
-        embed.add_field(name=f"/{command}", value=f"{details.get('description', '⚠️ No description available.')}\n**Usage:** `{details.get('usage', '⚠️ No usage provided.')}`", inline=False)
+        embed.add_field(
+            name=f"/{command}",
+            value=f"{details.get('description', '⚠️ No description available.')}\n**Usage:** `{details.get('usage', '⚠️ No usage provided.')}`",
+            inline=False
+        )
 
-    view = HelpView(page)  # Start at page 1
-    await interaction.response.send_message(embed=embed, view=view)
+    view = HelpView(page)  # Keep pagination view intact
+
+    try:
+        await interaction.user.send(embed=embed, view=view)  # Send DM
+        await interaction.followup.send("📩 Check your DMs for the help menu!", ephemeral=True)  # Follow-up in server
+
+    except discord.Forbidden:
+        await interaction.followup.send("⚠️ I couldn't send you a DM. Please check your privacy settings!", ephemeral=True)
+
+
+bot.run(TOKEN)
