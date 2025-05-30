@@ -1,0 +1,17 @@
+{
+    "commands": [
+        {"name": "set_lobby", "description" : "Set the lobby voice channel"},
+        {"name": "set_category", "description": "Set the category for temp voice channels"},
+        {"name": "move", "description": "Move selected users to another voice channel"},
+        {"name": "moveall", "description": "Move all users from one voice channel to another"},
+        {"name": "showbones", "description": "Show Bones List"},
+        {"name": "addname", "description": "Add a name to the Bones List"},
+        {"name": "bone", "description": "Add +1 bone to a name's count"},
+        {"name": "settimezone", "description": "Set your timezone using a dropdown menu"},
+        {"name": "removename", "description": "Remove a name from the list"},
+        {"name": "adjustcount", "description": "Manually adjust the count for a name"},
+        {"name": "help", "description": "Displays available commands and sends a detailed help menu via DM"},
+        {"name": "join", "description": "Bot joins your voice channel", "deprecated" : true},
+        {"name": "leave", "description": "Bot leaves the voice channel", "deprecated" : true}
+    ]
+}
