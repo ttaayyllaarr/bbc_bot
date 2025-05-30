@@ -16,6 +16,9 @@ jobs:
         run: |
           echo "${{ secrets.AWS_SSH_KEY }}" > key.pem
           chmod 600 key.pem
+          ls -lah key.pem  # ✅ Debug: Check if key.pem exists
+          cat key.pem | head -n 5  # ✅ Debug: Show first 5 lines of key
+
 
       - name: Debug Key Header
         run: |
@@ -31,6 +34,7 @@ jobs:
             cd /home/ec2-user/bbc_bot
             git pull origin main
             pm2 restart all
+
 
 env:
   DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
