@@ -12,15 +12,14 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v3
 
-      - name: Decode SSH Key
+      - name: Store SSH Key
         run: |
-          echo "${{ secrets.AWS_SSH_KEY_BASE64 }}" | base64 -d > key.pem
+          echo "${{ secrets.AWS_SSH_KEY }}" > key.pem
           chmod 600 key.pem
-          
+
       - name: Debug Key Header
         run: |
           head -n 1 key.pem
-
 
       - name: SSH into AWS and deploy
         uses: appleboy/ssh-action@v0.1.3
@@ -32,8 +31,6 @@ jobs:
             cd /home/ec2-user/bbc_bot
             git pull origin main
             pm2 restart all
-
-
 
 env:
   DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
