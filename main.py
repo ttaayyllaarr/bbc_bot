@@ -657,15 +657,6 @@ async def on_voice_state_update(member, before, after):
             await temp_channel.delete(reason="Temporary channel emptied.")
             del temporary_channels[before.channel.id]
 
-"""
-class MemberListTransform(app_commands.Transformer):
-    # Transforms a string list into actual Discord Member objects.
-    async def transform(self, interaction: discord.Interaction, value: str):
-        member_ids = value.split(",")  # Expect comma-separated user IDs
-        members = [interaction.guild.get_member(int(member_id.strip())) for member_id in member_ids]
-        return [m for m in members if m]  # Remove None values (invalid members)
-"""    
-
 # """
 @bot.tree.command(name="join", description="Bot joins your voice channel")
 async def join(interaction: discord.Interaction):
