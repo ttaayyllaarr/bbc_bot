@@ -15,9 +15,10 @@ jobs:
       - name: Store SSH Key
         run: |
           echo "${{ secrets.AWS_SSH_KEY }}" > key.pem
-          chmod 600 key.pem
-          ls -lah key.pem  # ✅ Debug: Check if key.pem exists
-          cat key.pem | head -n 5  # ✅ Debug: Show first 5 lines of key
+          chmod 400 key.pem  # ✅ Correct permissions for AWS SSH authentication
+          ls -lah key.pem  # ✅ Debug: Verify the file exists
+          head -n 5 key.pem  # ✅ Debug: Check the key format
+
 
 
       - name: Debug Key Header
